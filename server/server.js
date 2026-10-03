@@ -7,10 +7,11 @@
 // YOUR TASK: connect Prisma + PostgreSQL. Follow the TODOs below.
 // You should NOT need to change routes/threads.js or anything in client/.
 // ─────────────────────────────────────────────────────────────
-import "dotenv/config"; // loads DATABASE_URL from .env before anything reads process.env
+/*import "dotenv/config"; // loads DATABASE_URL from .env before anything reads process.env
 import express from "express";
 import cors from "cors";
 import threadsRouter from "./routes/threads.js";
+import prisma from "./prisma/client.js";
 
 // TODO 1: import the PrismaClient singleton you will create in prisma/client.js
 //   import prisma from "./prisma/client.js";
@@ -34,3 +35,33 @@ app.listen(PORT, () => {
   console.log(`✅ Threadbase API running on http://localhost:${PORT}`);
   console.log("⚠️  Prisma is NOT connected yet — complete the TODOs to add it.");
 });
+*/
+import "dotenv/config"; // loads DATABASE_URL from .env before anything reads process.env
+import express from "express";
+import cors from "cors";
+import threadsRouter from "./routes/threads.js";
+import prisma from "./prisma/client.js";
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.use("/api/threads", threadsRouter);
+
+const PORT = 3001;
+
+async function startServer() {
+  try {
+    await prisma.$connect();
+    console.log("✅ Prisma connected to PostgreSQL");
+
+    app.listen(PORT, () => {
+      console.log(`✅ Threadbase API running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Prisma connection failed:", error);
+    process.exit(1);
+  }
+}
+
+startServer();
